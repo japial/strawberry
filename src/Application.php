@@ -99,7 +99,10 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
             // https://book.cakephp.org/4/en/controllers/middleware.html#cross-site-request-forgery-csrf-middleware
             ->add(new CsrfProtectionMiddleware([
                 'httponly' => true,
-            ]));
+            ]))
+            ->add(new RoutingMiddleware($this))
+            // add Authentication after RoutingMiddleware
+            ->add(new AuthenticationMiddleware($this));
 
         return $middlewareQueue;
     }
@@ -122,17 +125,6 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
         $this->addPlugin('Migrations');
 
         // Load more plugins here
-    }
-
-    public function middleware(MiddlewareQueue $middlewareQueue): MiddlewareQueue
-    {
-        $middlewareQueue
-            // ... other middleware added before
-            ->add(new RoutingMiddleware($this))
-            // add Authentication after RoutingMiddleware
-            ->add(new AuthenticationMiddleware($this));
-
-        return $middlewareQueue;
     }
 
     public function getAuthenticationService(ServerRequestInterface $request): AuthenticationServiceInterface
